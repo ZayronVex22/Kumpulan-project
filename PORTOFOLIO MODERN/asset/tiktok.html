@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TikTok Downloader</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1e1e2f;
+            color: #ffffff;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+        }
+        .container {
+            text-align: center;
+            max-width: 400px;
+            background: #2c2c3c;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        input {
+            background: #3b3b4e;
+            color: #ffffff;
+        }
+        button {
+            background: #1e90ff;
+            color: #ffffff;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0c7bdb;
+        }
+        .result a {
+            color: #1e90ff;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>TikTok Downloader</h1>
+        <p>Masukin URL video TikTok lu di bawah:</p>
+        <input type="text" id="url" placeholder="Masukin URL TikTok di sini">
+        <button onclick="downloadVideo()">Download</button>
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        function downloadVideo() {
+            const url = document.getElementById("url").value;
+            const resultDiv = document.getElementById("result");
+            if (!url) {
+                resultDiv.innerHTML = "<p style='color: red;'>URL nggak boleh kosong!</p>";
+                return;
+            }
+            const apiKey = "HC-Ozb5PDmQ4uuoUx1";
+            const apiUrl = `https://beforelife.me/api/download/tiktok?url=${encodeURIComponent(url)}&apikey=${apiKey}`;
+            
+            // Buat link download langsung
+            resultDiv.innerHTML = `
+                <p>Download Video:</p>
+                <a href="${apiUrl}" target="_blank">Klik di sini buat download video</a>
+            `;
+        }
+    </script>
+</body>
+</html>

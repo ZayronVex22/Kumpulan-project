@@ -1,0 +1,138 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <link rel="icon" href="logo.png" type=".png">
+    <title>Loading Screen</title>
+    <style>
+        /* Global Styles */
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            background-color: #000; /* Black background */
+            color: #fff; /* White text */
+            font-family: Arial, sans-serif;
+        }
+
+        /* Loading Screen Container */
+        .loading-screen {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            background-color: #191919; /* Cyan background */
+            flex-direction: column;
+        }
+
+        /* Logo styling */
+        .logo {
+            width: 150px;
+            height: 150px;
+            background-image: url('logo.png'); /* Ganti dengan path logo kamu */
+            background-size: cover;
+            background-position: center;
+            border-radius: 50%; /* Membuat logo berbentuk bulat */
+            margin-bottom: 20px;
+        }
+
+        /* Text under the logo */
+        .loading-text {
+            font-size: 24px;
+            font-weight: bold;
+            text-align: center;
+        }
+          .loading-text {
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 5s steps(40);
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+    max-width: 100%;
+  }
+  to {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+
+/* Logo Style */
+        .logo {
+            width: 120px;
+            height: 120px;
+            background-color: #3498db; /* Example color for the logo */
+            border-radius: 50%; /* Make it circular */
+            margin-bottom: 20px;
+            animation: float 3s ease-in-out infinite; /* Animation for floating effect */
+        }
+
+        /* Animation for the floating logo */
+        @keyframes float {
+            0% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-20px); /* Move up */
+            }
+            100% {
+                transform: translateY(0); /* Move back down */
+            }
+        }
+
+        /* Loading Bar Container */
+        .loading-bar-container {
+            width: 80%;
+            height: 20px;
+            background-color: #ddd; /* Light gray background for the bar */
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        /* Actual Loading Bar */
+        .loading-bar {
+            height: 100%;
+            width: 0%; /* Start from 0% width */
+            background-color: #00bcd4; /* Cyan color for the bar */
+            border-radius: 10px;
+            animation: load 3s linear forwards; /* Animation for loading */
+        }
+        /* Keyframes for the loading bar animation */
+        @keyframes load {
+            0% {
+                width: 0%;
+            }
+            100% {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loading-screen">
+        <div class="logo"></div>
+        <!-- Loading Bar -->
+    <div class="loading-bar-container">
+        <div class="loading-bar"></div>
+    </div>
+        <div class="loading-text">Memuat asset...</div>
+    </div>
+
+    <script>
+        // Setelah 3 detik, arahkan ke home.html
+        setTimeout(function() {
+            window.location.href = "home.html";
+        }, 3000); // 3000 ms = 3 detik
+    </script>
+
+</body>
+</html>

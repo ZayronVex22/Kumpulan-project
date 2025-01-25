@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portofolio Saya</title>
+     <link rel="icon" href="logo.png" type=".png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* Reset dan Dasar */
+        body {
+            margin: 0;
+            font-family: 'Arial', sans-serif;
+            background-color: #1e1e2f;
+            color: #fff;
+            overflow-x: hidden;
+            transition: background-color 0.3s;
+        }
+
+        /* Toolbar */
+        #toolbar {
+  top: 0;
+  font-family: 'Monaco', 'Consolas', monospace;
+  left: 0;
+  width: 100%;
+  height: 60px; /* tinggi toolbar */
+  z-index: 1000;
+        position: fixed;
+            display: flex;
+            align-items: center;
+            padding-left: 16px;
+            background-color: #333;
+            color: white;
+            border-radius: 5px;
+            height: 60px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+        }
+
+        #toggle-sidebar-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            margin-right: 16px;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+
+        #toggle-sidebar-btn:active {
+            transform: scale(0.9);
+        }
+
+        h1 {
+            font-family: 'Terminal', 'Courier', monospace;
+            margin: 0;
+            font-size: 24px;
+            color: white;
+            text-shadow: 2px 2px 4px black, 0 0 10px cyan;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            position: fixed;
+            top: 60px;
+            border-radius: 20px;
+            left: -300px;
+            width: 300px;
+            height: calc(100% - 60px);
+            background-color: #222;
+            font-family: 'Monaco', 'Consolas', monospace;
+            overflow-y: auto;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
+            transition: left 0.3s ease, transform 0.3s ease;
+        }
+
+        #sidebar.active {
+                      position: fixed;
+            left: 0;
+        }
+
+        .menu-title {
+            font-size: 1.2em;
+            font-family: 'Terminal', 'Courier', monospace;
+            color: #0ff;
+
+            padding: 15px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .menu-item {
+            padding: 15px 20px;
+            color: #fff;
+            cursor: pointer;
+            box-shadow: 0 0 0 2px #000; /* ukuran dan warna garis tepi */
+            display: flex;
+            margin: 10px;
+            border-radius: 10px;
+            align-items: center;
+            transition: background 0.3s, transform 0.3s;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            
+
+            background-color: #2f2f2f; /* warna cyan */
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  box-shadow: 
+    0px 2px 2px rgba(0, 0, 0, 0.2), /* bayangan hitam */
+    0px 1px 1px rgba(0, 203, 212, 0.5); /* bayangan cyan */
+  border-radius: 5px;
+        }
+
+        .menu-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateX(10px);
+        }
+
+        .menu-item i {
+            margin-right: 10px;
+            font-size: 1.2em;
+            color: #0ff;
+        }
+
+        /* Content */
+        #content {
+
+
+            margin-left: 0;
+
+            padding: 20px;
+            transition: margin-left 0.3s;
+        }
+
+        #content.with-sidebar {
+            margin-left: 300px;
+        }
+
+        .content-section {
+            display: none;
+        }
+
+        .content-section.active {
+          transition: transform 0.3s ease;
+            display: block;
+        }
+
+
+
+
+
+        /* Iframe Container */
+        #iframe-container {
+
+            display: none;
+            width: 100%;
+  
+  overflow: hidden;
+            width: 100%;
+            height: 100%;
+        }
+
+/* Mengatur iframe agar mengisi seluruh layar dengan margin 50px di atas */
+iframe {
+    position: absolute;       /* Menggunakan posisi absolut untuk mengatur posisi iframe */
+    top: 70px;                /* Memberikan margin 50px dari atas */
+    left: 0;                  /* Memastikan iframe dimulai dari sisi kiri */
+    right: 0;                 /* Memastikan iframe mengisi lebar penuh */
+    bottom: 0;                /* Memastikan iframe mengisi tinggi layar */
+    width: 100%;                /* Lebar iframe 100% dari layar */
+    height: calc(100vh - 70px); /* Tinggi iframe 100% dari viewport dikurangi 50px (untuk margin atas) */
+    border: none;               /* Menghapus border iframe */
+}
+
+        p{
+            font-size: 16px;
+            color: #a5a5a5;
+            text-shadow: 2px 2px 4px black, 0 0 10px cyan;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+        a{
+            font-size: 16px;
+            color: #a5a5a5;
+            text-shadow: 2px 2px 4px black, 0 0 10px cyan;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+        p1{
+            font-size: 12px;
+            color: #a5a5a5;
+            text-shadow: 2px 2px 4px black, 0 0 10px cyan;
+            font-family: 'Monaco', 'Consolas', monospace;
+        }
+        .dayra {
+    position: fixed;          /* Menggunakan fixed agar tetap di layar */
+    top: 50px;                /* Memberikan jarak 50px dari atas */
+    left: 0;
+    width: 100vw;             /* Lebar 100% dari viewport */
+    height: calc(100vh - 50px); /* Tinggi 100% dari viewport dikurangi 50px (untuk toolbar) */
+    border: none;
+}
+
+    </style>
+</head>
+<body>
+
+    <!-- Toolbar -->
+    <div id="toolbar">
+        <button id="toggle-sidebar-btn"><i class="fas fa-bars"></i></button>
+        <h1>Xev Project</h1>
+    </div>
+
+    <!-- Sidebar -->
+    <div id="sidebar">
+        <div class="menu-title">Dashboard</div>
+        <div class="menu-item" onclick="showContent('home')"><i class="fas fa-home"></i> Home</div>
+        <div class="menu-item" onclick="showContent('skills')"><i class="fas fa-cogs"></i> Keahlian</div>
+        <div class="menu-item" onclick="showContent('about')"><i class="fas fa-user"></i> Tentang Saya</div>
+
+
+
+
+        <div class="menu-title"> My Project</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/tiktok.html')"><i class="fas fa-laptop-code"></i>Tiktok Downloader</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/youtube.html')"><i class="fas fa-laptop-code"></i>Youtube Downloader</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/instagram.html')"><i class="fas fa-laptop-code"></i>Instagram Downloader</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/img2pdf.html')"><i class="fas fa-laptop-code"></i>Img to Pdf</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/pdf2img.html')"><i class="fas fa-laptop-code"></i>Pdf to Img</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/virus.html')"><i class="fas fa-laptop-code"></i>Scaning Virus</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/ai_goblock.html')"><i class="fas fa-laptop-code"></i>AI Gobl*k</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/remove_bg.html')"><i class="fas fa-laptop-code"></i>Remove Bg</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/img2link.html')"><i class="fas fa-laptop-code"></i>Img to link</div>
+        <div id="dayra" class="menu-item" onclick="loadIframe('asset/resize_img.html')"><i class="fas fa-laptop-code"></i>Resize Img</div>
+
+
+
+
+
+        <div class="menu-title">Informasi</div>
+        <div class="menu-item" onclick="showContent('help')"><i class="fas fa-question-circle"></i> Help</div>
+        <div class="menu-item" onclick="showContent('contact')"><i class="fas fa-phone"></i> Contact</div>
+        <div class="menu-item" onclick="showContent('report')"><i class="fas fa-flag"></i> Report</div>
+        
+   <footer class="footer">
+      <p>&copy; 2024 Dayra Ofc. Semua hak cipta dilindungi.</p>
+    </footer>
+    </div>
+
+    <!-- Content -->
+    <!-- Main content area -->
+  <div id="iframe-container">
+            <iframe id="iframe" src=""></iframe>
+        </div>
+    </div>
+    
+    
+    <div id="content">
+<div id="home" class="content-section active">
+  <br><br>
+  <div class="titid">
+<h4>Zayron Vex Official</h4>
+<p4 class="typing-text">Selamat datang <br>Di halaman utama portofolio saya!</p4>
+  </div>
+  <style>
+  h4{
+    font-family: 'Courier New', monospace;
+      font-size: 24px;
+      font: bold;
+  font-weight: bold;
+  background-size: 400px 100%;
+  background-image: linear-gradient(
+    90deg,
+    #ffffff,
+    #00bcd4 50%,
+    #ffffff 100%
+  );
+  background-position: 0%;
+  animation: gradient-move 3s infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes gradient-move {
+  0% {
+    background-position: 0%;
+  }
+  100% {
+    background-position: 100%;
+  }
+}
+
+  .typing-text {
+  font-size: 12px;
+  font-weight: bold;
+  font-family: 'Courier New', monospace;
+  overflow: hidden;
+  white-space: nowrap;
+  animation: typing 5s steps(40);
+}
+
+@keyframes typing {
+  from {
+    width: 0;
+    max-width: 100%;
+  }
+  to {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+</style>
+  
+  <br>
+  <div class="kontol">
+            <h1 class="kece">Information</h1>
+            <p> Disini saya hanya ingin membagikan pengalaman dan hasil dari project-project saya secara gratis akan tetapi masih dalam pengembangan yang masih dan masih sangat kurang untuk di sebut website</p>
+                     </div>
+<div class="kontol">
+<h1 class="kece">location Server Phone</h1><br>
+         <div class="tete"> <p id="timezone"></p></div>
+         <div class="tete"> <p id="language"></p></div>
+         </div>
+         
+ <div class="kontol">        
+ <h1 class="kece">Device Info</h1><br>
+         <div class="tete"> <p id="platform"></p></div>
+         <div class="tete"> <p id="device-memory"></p></div>
+         <div class="tete"> <p id="device-type"></p></div>
+          <div class="tete"> <p id="screen-resolution"></p></div>
+          </div>
+</div>
+<style>
+
+        .titid {
+            background: url('background.png') center/cover no-repeat;
+            height: 80vh;
+            color: white;
+            border-radius: 20px;
+            text-align: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+position: fixed
+            animation: fadeIn 2s ease-out;
+            position: relative;
+        }
+
+        .titid:before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            border-radius: 20px;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .titid h4 {
+            font-size: 4em;
+            margin-bottom: 10px;
+            border-radius: 20px;
+            z-index: 2;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
+            
+        }
+
+        .titid p4 {
+            font-size: 1.5em;
+            border-radius: 20px;
+            z-index: 2;
+            text-shadow: 3px 3px 5px rgba(0, 0, 0, 0.7);
+        }
+
+
+
+.kontol {
+    background: #121a22; /* Background kategori skill */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 0 0 2px #000; /* ukuran dan warna garis tepi */
+    margin-bottom: 20px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.kece {
+    background: #121a22; /* Background kategori skill */
+    border-radius: 10px;
+    box-shadow: inset 10px 10px 5px #2a2a2a;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+  .tete {
+    background: #121a22; /* Background kategori skill */
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2); /* Shadow luar bercahaya */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Animasi hover pada kategori */
+.tete:hover {
+    transform: scale(1.02);
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.4);
+}
+</style>
+<script>
+  const timezoneInfo = document.getElementById("timezone");
+  timezoneInfo.innerText = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const platformInfo = document.getElementById("platform");
+platformInfo.innerText = navigator.platform;
+const deviceMemoryInfo = document.getElementById("device-memory");
+deviceMemoryInfo.innerText = navigator.deviceMemory + ' GB';
+const deviceTypeInfo = document.getElementById("device-type");
+function getDeviceType() {
+  const userAgent = navigator.userAgent.toLowerCase();
+  if (userAgent.includes("mobile")) return "Mobile";
+  if (userAgent.includes("tablet")) return "Tablet";
+  return "Desktop";
+}
+deviceTypeInfo.innerText = getDeviceType();
+const screenResolutionInfo = document.getElementById("screen-resolution");
+screenResolutionInfo.innerText = `${screen.width} x ${screen.height} piksel`;
+const languageInfo = document.getElementById("language");
+languageInfo.innerText = navigator.language || navigator.userLanguage;
+</script>
+
+</div>
+
+<br><br>
+<div id="skills" class="content-section">
+    <div class="meki">
+<h1 class="kece">Keahlian Saya</h1><br>
+        <!-- Pemrograman Web -->
+        <div class="Memek">
+            <h2><i class="fas fa-code"></i> Pemrograman Web</h2>
+            <ul>
+                <li>HTML</li>
+                <li>CSS</li>
+                <li>JavaScript</li>
+            </ul>
+        </div>
+
+        <!-- Manajemen Basis Data -->
+        <div class="Memek">
+            <h2><i class="fas fa-database"></i> Manajemen Basis Data</h2>
+            <ul>
+                <li>MySQL</li>
+                <li>MongoDB</li>
+            </ul>
+        </div>
+
+        <!-- Framework -->
+        <div class="Memek">
+            <h2><i class="fas fa-laptop-code"></i> Framework</h2>
+            <ul>
+                <li>React</li>
+                <li>Vue.js</li>
+                <li>Node.js</li>
+            </ul>
+        </div>
+
+        <!-- Cloud Computing -->
+        <div class="Memek">
+            <h2><i class="fas fa-cloud"></i> Cloud Computing</h2>
+            <ul>
+                <li>AWS</li>
+                <li>Azure</li>
+            </ul>
+        </div>
+
+        <!-- Keamanan Cyber -->
+        <div class="Memek">
+            <h2><i class="fas fa-lock"></i> Keamanan Cyber</h2>
+            <ul>
+                <li>Penetration Testing</li>
+                <li>Ethical Hacking</li>
+            </ul>
+        </div>
+    </div>
+</div>
+<style>
+/* Section Style */
+#skills-section {
+    background: #0d1117; /* Warna latar belakang gelap bertema cyber */
+    color: #c9d1d9; /* Warna teks utama */
+    padding: 30px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.8); /* Shadow luar */
+    animation: fadeIn 1.2s ease-in-out; /* Animasi muncul */
+    max-width: 800px;
+    margin: 20px auto; /* Tengah layar */
+    text-align: center;
+}
+
+/* Judul Section */
+#skills-section h1 {
+    font-size: 36px;
+    color: cyan;
+    text-shadow: 2px 2px 4px black, 0 0 10px cyan;
+    margin-bottom: 15px;
+    text-align: center;
+}
+.meki {
+  width: 80%;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #1a1d23;
+  border: 1px solid #3a3f4e;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.kece {
+  color: #00bcd4;
+  text-align: center;
+  font-size: 36px;
+  font-weight: bold;
+  animation: blink 2s infinite;
+}
+
+.Memek {
+  margin-bottom: 20px;
+  padding: 20px;
+  text-align: center;
+  background-color: #2f343f;
+  border: 1px solid #4e556f;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+}
+
+.Memek h2 {
+  color: #00bcd4;
+  font-size: 24px;
+  margin: 0 auto;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+.Memek ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.Memek li {
+  padding: 10px;
+  border-bottom: 1px solid #4e556f;
+}
+
+.Memek li:last-child {
+  border-bottom: none;
+}
+
+.Memek li:hover {
+  background-color: #3a3f4e;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Skill Category Container */
+.Memek {
+    background: #121a22; /* Background kategori skill */
+    padding: 20px;
+    border-radius: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+    box-shadow: 0 4px 15px rgba(0, 255, 255, 0.2); /* Shadow luar bercahaya */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* Animasi hover pada kategori */
+.Memek:hover {
+    transform: scale(1.02);
+    text-align: center;
+    box-shadow: 0 6px 20px rgba(0, 255, 255, 0.4);
+}
+
+/* Header Skill */
+.Memek h2 {
+    font-size: 24px
+    text-align: center;
+    color: cyan;
+    text-shadow: 2px 2px 4px black, 0 0 8px cyan;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+}
+
+/* Ikon di header */
+.Memek h2 i {
+    font-size: 28px;
+    margin-right: 10px;
+    color: cyan;
+    text-align: center;
+    transition: transform 0.3s ease;
+}
+
+/* Hover pada ikon header */
+.Memek h2:hover i {
+  text-align: center;
+    transform: rotate(15deg);
+}
+
+/* Daftar keahlian */
+.Memek ul {
+  text-align: center;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.Memek ul li {
+    font-size: 18px;
+    margin: 5px 0;
+    padding-left: 20px;
+    position: relative;
+    color: #c9d1d9
+    text-align: center;
+    transition: color 0.3s ease, padding-left 0.3s ease;
+}
+
+/* Animasi hover pada daftar keahlian */
+.Memek ul li:hover {
+    color: cyan;
+    text-align: center;
+    padding-left: 30px;
+}
+
+/* Bullet list diganti dengan efek garis */
+.Memek ul li:before {
+    content: '';
+    position: absolute;
+    left: 0;
+    text-align: center;
+    transform: translateY(-50%);
+    width: 8px;
+    height: 8px;
+    background: cyan;
+    border-radius: 50%;
+    box-shadow: 0 0 10px cyan;
+}
+    .footer {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      background: #1d1d1d;
+      text-align: center;
+      padding: 10px 0;
+      color: #fff;
+      font-size: 14px;
+      border-top: 2px solid #333;
+    }
+
+    #contact {
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.1);
+    max-width: 900px;
+    margin: 30px auto;
+    font-family: 'Arial', sans-serif;
+}
+
+.contact-details h1 {
+    font-size: 2.2em;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.contact-details h2 {
+    font-size: 1.5em;
+    margin: 15px 0;
+    line-height: 1.6;
+}
+
+.contact-details h3 {
+    font-size: 1.2em;
+    margin-top: 30px;
+    font-style: italic;
+    text-align: center;
+}
+
+.contact-details a {
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.contact-details a:hover {
+    text-decoration: underline;
+}
+
+.contact-details span {
+    display: block;
+    margin-top: 10px;
+    font-size: 1.1em;
+}
+
+</style>
+
+        <div id="about" class="content-section">
+            <h1 class="kece">Informasi Tentang Saya</h1><br>
+        <div class="tete"><br><h1>Tentang Saya</h1>
+<p1>Halo, saya Dayra, berusia 18 tahun dan akan segera memasuki usia 19. Saat ini, saya masih bersekolah di SMA dan memiliki cita-cita besar untuk menjadi seorang profesional di bidang teknologi. Meskipun prestasi saya belum diketahui banyak orang, saya tetap bersemangat untuk terus belajar dan meningkatkan kemampuan saya.<br>
+<br>Saya memiliki hobi yang sangat menyenangkan, yaitu coding. Saya merasa tertantang dan puas ketika berhasil menyelesaikan proyek atau memecahkan masalah kompleks. Coding tidak hanya meningkatkan kemampuan saya, tetapi juga membantu saya mengembangkan logika, kreativitas, dan kesabaran.><br>
+</div><br>
+        <div class="tete"><h1>Visi dan Misi</h1>
+<p1>- Meningkatkan kemampuan coding dalam berbagai bahasa pemrograman.</p1><br>
+<p1>- Mengembangkan proyek-proyek inovatif dan bermanfaat.</p1><br>
+<p1>- Berbagi pengetahuan dengan komunitas developer muda.</p1><br>
+<p1>- Mencapai kesuksesan di bidang teknologi dan menjadi inspirasi bagi orang lain.</p1><br></div>
+<p1></p1><br>
+        <div class="tete"><h1>Keterampilan</h1>
+<p1>- Bahasa pemrograman (JavaScript, HTML, CSS, Python)</p1><br>
+<p1>- Pengembangan web (Front-end dan Back-end)</p1><br>
+<p1>- Basis data (MySQL, MongoDB)</p1><br>
+<p1>- Sistem operasi (Windows, Linux)</p1><br></div>
+
+        </div>
+
+        <div id="help" class="content-section">
+                                        <div class="Memek">
+            <h1>Help</h1>
+            <p>
+---
+<br>
+<br>
+Jika Anda mengalami masalah atau memiliki pertanyaan terkait penggunaan aplikasi atau website kami, kami siap membantu Anda. Untuk melaporkan masalah atau bertanya lebih lanjut, Anda dapat menghubungi kami melalui bagian *Contact* yang tersedia di menu utama. Tim kami akan segera merespons dan memberikan solusi terbaik untuk memastikan pengalaman Anda berjalan lancar.
+<br>
+Kami juga sangat menghargai setiap masukan yang Anda berikan. Jika Anda menemukan adanya *crash*, *bug*, atau kendala teknis lainnya selama menggunakan aplikasi atau website kami, kami mohon dengan hormat untuk segera melaporkannya. Anda dapat melaporkan masalah tersebut dengan mengklik menu *Report* yang tersedia. Dengan melaporkan masalah, Anda turut membantu kami untuk memperbaiki dan meningkatkan kualitas layanan kami.
+<br>
+Setiap laporan yang Anda kirimkan akan segera ditindaklanjuti oleh tim teknis kami agar masalah dapat diselesaikan dengan cepat dan efisien. Kami berkomitmen untuk memberikan pengalaman terbaik bagi semua pengguna.
+<br>
+Terima kasih atas kepercayaan dan kerjasama Anda. Kami sangat menghargai waktu dan perhatian Anda!
+<br>
+---</p>        </div>
+        </div>
+
+<div id="contact" class="content-section">
+    <div class="contact-details">
+        <h1>Halo, Terima Kasih Telah Mengunjungi Halaman Kontak Saya!</h1>
+        
+        <h2>Jika Anda memiliki pertanyaan, permintaan, atau ingin berdiskusi lebih lanjut mengenai proyek atau topik lainnya, Anda dapat menghubungi saya melalui dua cara berikut:</h2>
+
+        <h2>1. <strong>WhatsApp</strong>: 
+            <span>Untuk percakapan yang lebih cepat dan langsung, Anda bisa menghubungi saya melalui WhatsApp. Klik tautan berikut untuk mengirim pesan langsung:</span>
+            <a href="https://wa.me/6287718203240" target="_blank">Klik di sini untuk menghubungi saya via WhatsApp</a>
+        </h2>
+        
+        <h2>2. <strong>Email</strong>: 
+            <span>Jika Anda lebih nyaman menggunakan email, Anda dapat mengirimkan pesan atau pertanyaan Anda melalui email saya. Jangan ragu untuk menghubungi saya dan saya akan segera merespons pesan Anda:</span><a href="mailto:zayronxev22@gmail.com?subject=Halo%20Kak!!" target="_blank">Klik di sini untuk mengirimkan email kepada saya</a>
+        </h2>
+
+        <h3>Jangan ragu untuk menghubungi saya kapan saja, saya akan dengan senang hati membantu Anda dengan segala pertanyaan atau kebutuhan yang Anda miliki. Terima kasih!</h3>
+       
+    </div>
+</div>
+
+
+
+        <div id="report" class="content-section">
+                  <div class="Memek">
+            <h1>Report</h1>
+            <p>Jika Anda mengalami bug atau crash pada layar tertentu, atau jika ada item yang tidak berfungsi dengan baik dan mengganggu pengalaman Anda dalam menjelajahi website ini, kami sangat mengapresiasi jika Anda melaporkannya kepada kami. Anda dapat mengirimkan laporan Anda melalui email di alamat berikut: [alamat email Anda di sini]. Kami akan segera menindaklanjuti laporan Anda untuk memastikan bahwa website ini berfungsi dengan optimal.
+<br> <a href="mailto:zayronxev22@gmail.com?subject=Laporan%20Bug%2FCrash&body=Yth.%20Tim%20Pengembang%2C%0A%0ASaya%20menemukan%20bug%2Fcrash%20pada%20bagian%20%5Bnama%20fitur%2Fbagian%5D.%20Saya%20melampirkan%20bukti%20screenshot%20untuk%20referensi.%0A%0AMohon%20perbaikan%20secepatnya.%0A%0ATerima%20kasih.%0A%5BNama%20Anda%5D">KLIK DI SINI</a></p>
+    </div>
+
+    <script>
+        const sidebar = document.getElementById('sidebar');
+        const content = document.getElementById('content');
+        const toggleSidebarBtn = document.getElementById('toggle-sidebar-btn');
+        const contentSections = document.querySelectorAll('.content-section');
+        const iframeContainer = document.getElementById('iframe-container');
+        const iframe = document.getElementById('iframe');
+
+        toggleSidebarBtn.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            content.classList.toggle('with-sidebar');
+        });
+
+        function showContent(sectionId) {
+  contentSections.forEach(section => section.classList.remove('active'));
+  document.getElementById(sectionId).classList.add('active');
+  iframeContainer.style.display = 'none';
+  iframe.src = '';
+  
+  // Tutup sidebar
+  sidebar.classList.remove('active');
+  content.classList.remove('with-sidebar');
+}
+
+ 
+
+        function loadIframe(url) {
+            contentSections.forEach(section => section.classList.remove('active'));
+            iframeContainer.style.display = 'block';
+            iframe.src = url;
+        }
+        
+    </script>
+</body>
+</html>

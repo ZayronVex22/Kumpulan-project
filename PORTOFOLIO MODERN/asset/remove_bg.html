@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remove Background - Modern Editor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: #2c3e50;
+            font-family: 'Arial', sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            color: white;
+            overflow: hidden;
+            flex-direction: column;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            font-size: 3rem;
+            color: #ecf0f1;
+            text-align: center;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            0% { opacity: 0; }
+            100% { opacity: 1; }
+        }
+
+        .container {
+            background: #34495e;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 600px;
+        }
+
+        .upload-btn, #removeBgButton, #downloadButton, #chooseColorButton, #chooseKTPRedButton, #chooseKTPBlueButton {
+            padding: 15px 30px;
+            background: #1abc9c;
+            color: white;
+            font-size: 1.2rem;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            transition: background 0.3s ease;
+        }
+
+        .upload-btn:hover, #removeBgButton:hover, #downloadButton:hover, #chooseColorButton:hover, #chooseKTPRedButton:hover, #chooseKTPBlueButton:hover {
+            background: #16a085;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        #imagePreview {
+            display: none;
+            width: 100%;
+            margin-top: 20px;
+            border-radius: 10px;
+            border: 2px solid #444;
+        }
+
+        #loading {
+            display: none;
+            color: #ff9800;
+            font-size: 1.5rem;
+            margin-top: 20px;
+        }
+
+        #error {
+            color: #e74c3c;
+            font-size: 1.2rem;
+            display: none;
+            margin-top: 20px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        #colorPickerContainer {
+            margin-top: 20px;
+            display: none;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        #colorPicker {
+            padding: 12px;
+            border-radius: 10px;
+            border: none;
+            width: 60px;
+            height: 60px;
+            background-color: #fff;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        #colorPicker:focus {
+            outline: none;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.7);
+        }
+
+        #chooseColorButton {
+            background: #e67e22;
+            transition: background 0.3s ease;
+        }
+
+        #chooseColorButton:hover {
+            background: #d35400;
+        }
+
+        #chooseColorButton:active {
+            transform: scale(0.98);
+        }
+
+        /* Button styles for KTP templates */
+        #chooseKTPRedButton, #chooseKTPBlueButton {
+            background: #3498db; /* Default color for KTP buttons */
+        }
+
+        #chooseKTPRedButton:hover, #chooseKTPBlueButton:hover {
+            background: #2980b9;
+        }
+.footer {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background-color: #1d1d1d;
+            color: #fff;
+            padding: 10px;
+            text-align: center;
+            font-size: 1rem;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Remove Background - Modern Editor</h1>
+    <div class="container">
+        <input type="file" id="fileInput" accept="image/*">
+        <label for="fileInput" class="upload-btn">Upload Image</label>
+        <button id="removeBgButton" class="hidden">Remove Background</button>
+        <div id="loading" class="hidden">Processing...</div>
+        <img id="imagePreview" class="hidden" src="" alt="Image Preview">
+        <button id="downloadButton" class="hidden">Download Image</button>
+        <button id="chooseColorButton" class="hidden">Costum Background</button>
+        
+        <div id="colorPickerContainer" class="hidden">
+            <input type="color" id="colorPicker" />
+        </div>
+
+        <!-- KTP template buttons -->
+        <button id="chooseKTPRedButton" class="hidden">KTP Red Background</button>
+        <button id="chooseKTPBlueButton" class="hidden">KTP Blue Background</button>
+
+        <div id="error" class="hidden">Something went wrong. Please try again.</div>
+    </div>
+<div class="footer">
+        <p>&copy; 2024 Zayron Vex 22</p>
+    </div>
+
+    <script>
+        const fileInput = document.getElementById('fileInput');
+        const uploadButton = document.querySelector('.upload-btn');
+        const removeBgButton = document.getElementById('removeBgButton');
+        const imagePreview = document.getElementById('imagePreview');
+        const loadingText = document.getElementById('loading');
+        const downloadButton = document.getElementById('downloadButton');
+        const chooseColorButton = document.getElementById('chooseColorButton');
+        const colorPicker = document.getElementById('colorPicker');
+        const colorPickerContainer = document.getElementById('colorPickerContainer');
+        const chooseKTPRedButton = document.getElementById('chooseKTPRedButton');
+        const chooseKTPBlueButton = document.getElementById('chooseKTPBlueButton');
+        const errorMessage = document.getElementById('error');
+
+        const API_KEY = "WKpiZ75XJaU2DUoqKk7XrgWf"; // API Key from remove.bg
+
+        let selectedColor = "#ffffff";  // Default color is white
+        let processedImageSrc = ""; // Store processed image src
+
+        fileInput.addEventListener('change', handleFileSelect);
+        removeBgButton.addEventListener('click', () => processImage(fileInput.files[0]));
+        downloadButton.addEventListener('click', downloadImage);
+        chooseColorButton.addEventListener('click', () => showColorPicker());
+        colorPicker.addEventListener('input', () => changeImageBackgroundColor());
+        chooseKTPRedButton.addEventListener('click', () => applyKTPBackground('red'));
+        chooseKTPBlueButton.addEventListener('click', () => applyKTPBackground('blue'));
+
+        async function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = () => {
+                imagePreview.src = reader.result;
+                imagePreview.style.display = 'block';
+                removeBgButton.style.display = 'inline-block';
+            };
+            reader.readAsDataURL(file);
+        }
+
+        async function processImage(file) {
+            loadingText.style.display = 'block';
+            imagePreview.style.display = 'none';
+            downloadButton.style.display = 'none';
+            chooseColorButton.style.display = 'none';
+            chooseKTPRedButton.style.display = 'none';
+            chooseKTPBlueButton.style.display = 'none';
+            errorMessage.style.display = 'none';
+
+            const formData = new FormData();
+            formData.append('image_file', file);
+
+            try {
+                const response = await fetch('https://api.remove.bg/v1.0/removebg', {
+                    method: 'POST',
+                    headers: {
+                        'X-Api-Key': API_KEY
+                    },
+                    body: formData
+                });
+
+                if (!response.ok) {
+                    throw new Error('Failed to remove background');
+                }
+
+                const blob = await response.blob();
+                const imageUrl = URL.createObjectURL(blob);
+                processedImageSrc = imageUrl; // Store the processed image src
+                imagePreview.src = imageUrl;
+                imagePreview.style.display = 'block';
+                loadingText.style.display = 'none';
+                downloadButton.style.display = 'inline-block';
+                chooseColorButton.style.display = 'inline-block';
+                chooseKTPRedButton.style.display = 'inline-block';
+                chooseKTPBlueButton.style.display = 'inline-block';
+            } catch (error) {
+                console.error(error);
+                loadingText.style.display = 'none';
+                errorMessage.style.display = 'block';
+            }
+        }
+
+        function showColorPicker() {
+            colorPickerContainer.style.display = 'flex';  // Show color picker container
+        }
+
+        function changeImageBackgroundColor() {
+            selectedColor = colorPicker.value; // Update selected color
+            updateImageBackground(); // Apply new background to preview image
+        }
+
+        function updateImageBackground() {
+            if (!processedImageSrc) return; // Only apply if the image is processed
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                // Fill canvas with the selected background color
+                ctx.fillStyle = selectedColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw the image on top of the background
+                ctx.drawImage(img, 0, 0);
+
+                // Update the preview image with the new background
+                imagePreview.src = canvas.toDataURL();
+            };
+            img.src = processedImageSrc;
+        }
+
+                function applyKTPBackground(color) {
+            if (!processedImageSrc) return; // Only apply if the image is processed
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            const img = new Image();
+            
+            img.onload = () => {
+                canvas.width = img.width;
+                canvas.height = img.height;
+
+                // Set KTP background color (Red or Blue)
+                if (color === 'red') {
+                    ctx.fillStyle = '#e74c3c'; // Red color for KTP background
+                } else if (color === 'blue') {
+                    ctx.fillStyle = '#2980b9'; // Blue color for KTP background
+                }
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+                // Draw the image on top of the KTP background
+                ctx.drawImage(img, 0, 0);
+
+                // Update the preview image with the new KTP background
+                imagePreview.src = canvas.toDataURL();
+            };
+            img.src = processedImageSrc;
+        }
+
+        function downloadImage() {
+            const a = document.createElement('a');
+            a.href = imagePreview.src;
+            a.download = 'image_with_removed_bg.png';
+            a.click();
+        }
+    </script>
+
+</body>
+</html>

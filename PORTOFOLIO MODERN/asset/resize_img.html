@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Resolution & FPS Adjuster</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #121212;
+            font-family: Arial, sans-serif;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background-color: #1d1d1d;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            width: 80%;
+            max-width: 600px;
+            overflow: hidden;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+            color: #00f5a0;
+        }
+
+        .input-container {
+            margin-bottom: 20px;
+        }
+
+        .input-container input,
+        .input-container select,
+        .input-container button {
+            padding: 10px;
+            margin: 10px;
+            font-size: 1rem;
+            border: 2px solid #444;
+            border-radius: 5px;
+            background-color: #333;
+            color: white;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #262626;
+            color: #ffffff;
+            border: none;
+                        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .button:hover {
+            background-color: #383838;
+        }
+
+        #imagePreview {
+            width: 100%;
+            max-width: 500px;
+            margin-top: 20px;
+            border-radius: 8px;
+            display: none;
+        }
+
+        .loading {
+            display: none;
+            color: #ff9800;
+            font-size: 1.5rem;
+            margin-top: 20px;
+        }
+
+        #fpsResult, #resolutionResult {
+            margin-top: 20px;
+            font-size: 1.2rem;
+        }
+
+        .input-container button i {
+            margin-right: 10px;
+        }
+
+        .spin {
+            animation: spin 2s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Adjust Image Resolution & FPS</h1>
+
+        <!-- Upload Image Section -->
+        <div class="input-container">
+            <label for="imageInput">Upload Image</label>
+            <input type="file" id="imageInput" accept="image/*">
+        </div>
+
+        <!-- Resolution Section -->
+        <div class="input-container">
+            <label for="resolutionSelect">Select Resolution (Width in pixels):</label>
+            <select id="resolutionSelect">
+                <option value="10">10px</option>
+                <option value="100">100px</option>
+                <option value="500">500px</option>
+                <option value="1000">1000px</option>
+                <option value="3840">UHD (3840px)</option>
+            </select>
+        </div>
+
+        <!-- Custom Size Section -->
+        <div class="input-container">
+            <label for="widthInput">Custom Width & height(px):</label><br>
+            <input type="number" id="widthInput" placeholder="Enter width">
+            <input type="number" id="heightInput" placeholder="Enter height">
+        </div>
+
+        <!-- Template for Screen Sizes -->
+        <div class="input-container">
+            <label for="screenSelect">Select Screen Size:</label>
+            <br>
+            <select id="screenSelect">
+                <option value="1920x1080">Full HD (1920x1080)</option>
+                <option value="1366x768">HD (1366x768)</option>
+                <option value="3840x2160">4K UHD (3840x2160)</option>
+                <option value="1280x720">HD Ready (1280x720)</option>
+                <option value="2560x1440">Quad HD (2560x1440)</option>
+            </select>
+        </div>
+
+        <!-- FPS Section -->
+        <div class="input-container">
+            <label for="fpsSelect">Select FPS:</label>
+            <select id="fpsSelect">
+                <option value="20">20 FPS</option>
+                <option value="30">30 FPS</option>
+                <option value="60">60 FPS</option>
+                <option value="90">90 FPS</option>
+                <option value="120">120 FPS</option>
+                <option value="144">144 FPS</option>
+                <option value="240">240 FPS</option>
+            </select>
+        </div>
+
+        <!-- Buttons -->
+        <button class="button" id="applyChangesBtn"><i class="fas fa-cogs"></i> Apply Changes</button>
+        <button class="button" id="clearBtn"><i class="fas fa-undo"></i> Clear</button>
+        <button class="button" id="downloadBtn"><i class="fas fa-download"></i> Download Image</button>
+
+        <!-- Results -->
+        <div id="fpsResult"></div>
+        <div id="resolutionResult"></div>
+
+        <!-- Loading Indicator -->
+        <div id="loading" class="loading">Processing...</div>
+
+        <img id="imagePreview" src="" alt="Image Preview">
+    </div>
+
+    <script>
+        const imageInput = document.getElementById("imageInput");
+        const resolutionSelect = document.getElementById("resolutionSelect");
+        const fpsSelect = document.getElementById("fpsSelect");
+        const widthInput = document.getElementById("widthInput");
+        const heightInput = document.getElementById("heightInput");
+        const screenSelect = document.getElementById("screenSelect");
+        const applyChangesBtn = document.getElementById("applyChangesBtn");
+        const imagePreview = document.getElementById("imagePreview");
+        const fpsResult = document.getElementById("fpsResult");
+        const resolutionResult = document.getElementById("resolutionResult");
+        const loadingIndicator = document.getElementById("loading");
+        const downloadBtn = document.getElementById("downloadBtn");
+        const clearBtn = document.getElementById("clearBtn");
+
+        let uploadedImage = null;
+
+        // Handle image upload
+        imageInput.addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    imagePreview.src = event.target.result;
+                    imagePreview.style.display = "block";
+                    uploadedImage = new Image();
+                    uploadedImage.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        // Apply changes
+        applyChangesBtn.addEventListener("click", () => {
+            const resolution = resolutionSelect.value;
+            const fps = fpsSelect.value;
+            const customWidth = widthInput.value || resolution; // Use custom width if entered
+            const customHeight = heightInput.value || uploadedImage.height * (customWidth / uploadedImage.width); // Maintain aspect ratio
+            const screenSize = screenSelect.value.split('x');
+
+            if (uploadedImage) {
+                loadingIndicator.style.display = "block"; // Show loading indicator
+
+                // Adjust image resolution (preserving quality)
+                const canvas = document.createElement("canvas");
+                const ctx = canvas.getContext("2d");
+
+                canvas.width = customWidth;
+                canvas.height = customHeight;
+                ctx.drawImage(uploadedImage, 0, 0, customWidth, customHeight);
+
+                // Apply HDR effect (simple example)
+                ctx.filter = "brightness(1.2) contrast(1.2) saturate(1.5)";
+                ctx.drawImage(uploadedImage, 0, 0, customWidth, customHeight);
+
+                imagePreview.src = canvas.toDataURL();
+                resolutionResult.innerText = `Resolution: ${customWidth}x${customHeight}px`;
+                fpsResult.innerText = `Selected FPS: ${fps} FPS`;
+
+                loadingIndicator.style.display = "none"; // Hide loading indicator
+            }
+        });
+
+        // Clear image and results
+        clearBtn.addEventListener("click", () => {
+            imageInput.value = '';
+            imagePreview.src = '';
+            imagePreview.style.display = 'none';
+            resolutionResult.innerText = '';
+            fpsResult.innerText = '';
+            widthInput.value = '';
+            heightInput.value = '';
+        });
+
+        // Download image
+        downloadBtn.addEventListener("click", () => {
+            const a = document.createElement('a');
+            a.href = imagePreview.src;
+            a.download = 'image_with_changes.png';
+            a.click();
+        });
+    </script>
+
+</body>
+</html>

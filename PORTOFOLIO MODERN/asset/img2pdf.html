@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Convert - Image to PDF</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    body {
+      font-family: 'Courier New', monospace;
+      background: #0d1117;
+      color: #00ffcc;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+
+    .container {
+      text-align: center;
+      background: #161b22;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.5);
+      max-width: 800px;
+      width: 100%;
+    }
+
+    h1 {
+      color: #00ffcc;
+      margin-bottom: 20px;
+      text-shadow: 0 0 10px rgba(0, 255, 204, 0.8);
+      font-size: 32px;
+    }
+
+    .button {
+      background-color: transparent;
+      border: 2px solid #00ffcc;
+      border-radius: 8px;
+      padding: 12px 24px;
+      color: #00ffcc;
+      cursor: pointer;
+      font-size: 18px;
+      margin: 10px;
+      transition: all 0.3s ease;
+    }
+
+    .button:hover {
+      background-color: #00ffcc;
+      color: #0d1117;
+      box-shadow: 0 0 10px #00ffcc, 0 0 20px #00ffcc;
+    }
+
+    input[type="file"] {
+      display: none;
+    }
+
+    .preview-container {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+      overflow-y: auto;
+      max-height: 300px;
+    }
+
+    .preview-item {
+      position: relative;
+      border: 1px solid #00ffcc;
+      border-radius: 8px;
+      padding: 5px;
+    }
+
+    .preview-item img {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 8px;
+    }
+
+    .preview-item button {
+      position: absolute;
+      top: -5px;
+      right: -5px;
+      background: rgba(255, 0, 0, 0.8);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      padding: 5px;
+      cursor: pointer;
+    }
+
+    .button-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 15px;
+      margin-top: 20px;
+    }
+
+    .progress-container {
+      margin-top: 20px;
+      text-align: center;
+      color: #00ffcc;
+      font-size: 16px;
+      display: none; /* Initially hidden */
+    }
+
+    .progress-bar {
+      width: 100%;
+      background: #444;
+      border-radius: 8px;
+      height: 10px;
+      margin-top: 10px;
+    }
+
+    .progress-bar span {
+      display: block;
+      height: 100%;
+      background: #00ffcc;
+      width: 0;
+      border-radius: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Cyber Convert - Image to PDF</h1>
+
+    <!-- Upload Button -->
+    <label for="image-files" class="button">Pilih Gambar</label>
+    <input type="file" id="image-files" accept="image/*" multiple>
+
+    <!-- Preview Container -->
+    <div class="preview-container" id="preview-container"></div>
+
+    <!-- Buttons -->
+    <div class="button-container">
+      <button id="convert-btn" class="button hidden">Convert to PDF</button>
+      <button id="download-btn" class="button hidden">Download PDF</button>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-container" id="progress-container">
+      <span>Loading... <span id="progress-percentage">0%</span></span>
+      <div class="progress-bar">
+        <span></span>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const imageInput = document.getElementById('image-files');
+    const previewContainer = document.getElementById('preview-container');
+    const convertBtn = document.getElementById('convert-btn');
+    const downloadBtn = document.getElementById('download-btn');
+    const progressContainer = document.getElementById('progress-container');
+    const progressPercentage = document.getElementById('progress-percentage');
+    const progressBar = progressContainer.querySelector('.progress-bar span');
+
+    let images = [];
+
+    // Preview images
+    imageInput.addEventListener('change', () => {
+      previewContainer.innerHTML = '';
+      images = [];
+      const files = Array.from(imageInput.files);
+
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          const img = document.createElement('img');
+          img.src = e.target.result;
+
+          const previewItem = document.createElement('div');
+          previewItem.classList.add('preview-item');
+          previewItem.appendChild(img);
+
+          const deleteBtn = document.createElement('button');
+          deleteBtn.textContent = '×';
+          deleteBtn.onclick = () => {
+            images = images.filter(item => item !== e.target.result);
+            previewItem.remove();
+          };
+
+          previewItem.appendChild(deleteBtn);
+          previewContainer.appendChild(previewItem);
+          images.push(e.target.result);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      convertBtn.classList.remove('hidden');
+    });
+
+    // Convert images to PDF
+    convertBtn.addEventListener('click', () => {
+      if (images.length === 0) {
+        alert('Tidak ada gambar untuk dikonversi!');
+        return;
+      }
+
+      const { jsPDF } = window.jspdf;
+      const pdf = new jsPDF();
+
+      let completed = 0;
+      progressContainer.style.display = 'block';
+
+      images.forEach((img, index) => {
+        const imgEl = new Image();
+        imgEl.src = img;
+        imgEl.onload = () => {
+          const imgWidth = pdf.internal.pageSize.getWidth();
+          const imgHeight = (imgEl.height * imgWidth) / imgEl.width;
+
+          if (index > 0) pdf.addPage();
+          pdf.addImage(img, 'JPEG', 0, 0, imgWidth, imgHeight);
+
+          completed++;
+          const progress = Math.round((completed / images.length) * 100);
+          progressPercentage.textContent = `${progress}%`;
+          progressBar.style.width = `${progress}%`;
+
+          if (completed === images.length) {
+            progressContainer.style.display = 'none';
+            downloadBtn.classList.remove('hidden');
+            const pdfBlob = pdf.output('blob');
+            downloadBtn.onclick = () => {
+              const link = document.createElement('a');
+              link.href = URL.createObjectURL(pdfBlob);
+              link.download = 'converted.pdf';
+              link.click();
+            };
+          }
+        };
+      });
+    });
+  </script>
+</body>
+</html>
