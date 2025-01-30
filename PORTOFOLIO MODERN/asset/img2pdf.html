@@ -238,6 +238,19 @@
         };
       });
     });
+    
+    
+    fetch(blobURL)
+  .then(res => res.blob())
+  .then(blob => {
+      let a = document.createElement("a");
+      a.href = URL.createObjectURL(blob);
+      a.download = "file.pdf"; // Ganti sesuai kebutuhan
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+  });
+
   </script>
 </body>
 </html>
